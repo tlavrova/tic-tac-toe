@@ -77,10 +77,13 @@ function Board({xIsNext, squares, onPlay}) {
     }
 
     const winner = calculateWinner(squares);
+    const isDraw = !winner && squares.every(square => square !== null);
     let status;
 
     if (winner) {
-        status = "Winner: " + winner;
+        status = "Winner: " + winner.winner;
+    } else if (isDraw) {
+        status = "Game ended in a draw";
     } else {
         status = "Next player: " + (xIsNext ? 'X' : 'O');
     }
@@ -96,6 +99,7 @@ function Board({xIsNext, squares, onPlay}) {
                     key={squareIndex}
                     value={squares[squareIndex]}
                     onSquareClick={() => handleClick(squareIndex)}
+                    isWinning={winner && winner.winningLine.includes(squareIndex)}
                 />
             );
         }
@@ -114,8 +118,15 @@ function Board({xIsNext, squares, onPlay}) {
     );
 }
 
-function Square({value, onSquareClick}) {
-    return <button className="square" onClick={onSquareClick}>{value}</button>
+function Square({value, onSquareClick, isWinning}) {
+    return (
+        <button
+            className={`square ${isWinning ? 'winning' : ''}`}
+            onClick={onSquareClick}
+        >
+            {value}
+        </button>
+    );
 }
 
 function calculateWinner(squares) {
@@ -133,7 +144,10 @@ function calculateWinner(squares) {
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
+            return {
+                winner: squares[a],
+                winningLine: lines[i]
+            };
         }
     }
     return null;
