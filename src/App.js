@@ -4,6 +4,7 @@ import {useState} from "react";
 export default function Game() {
     const [history, setHistory] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
+    const [isAscending, setIsAscending] = useState(true);
     const xIsNext = currentMove % 2 === 0;
     const currentSquares = history[currentMove];
 
@@ -15,6 +16,10 @@ export default function Game() {
 
     function jumpTo(nextMove) {
         setCurrentMove(nextMove);
+    }
+
+    function toggleSortOrder() {
+        setIsAscending(!isAscending);
     }
 
     const moves = history.map((squares, move) => {
@@ -34,14 +39,22 @@ export default function Game() {
                 )}
             </li>
         );
-    })
+    });
+
+    // Sort the moves based on the current sort order
+    const sortedMoves = isAscending ? moves : [...moves].reverse();
 
     return (<div className="game">
         <div className="game-board">
             <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/>
         </div>
         <div className="game-info">
-            <ol>{moves}</ol>
+            <div>
+                <button onClick={toggleSortOrder}>
+                    Sort moves: {isAscending ? "Ascending" : "Descending"}
+                </button>
+            </div>
+            <ol>{sortedMoves}</ol>
         </div>
     </div>)
 }
